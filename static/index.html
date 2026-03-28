@@ -1,0 +1,178 @@
+﻿<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculadora API - Frontend</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f1ea;
+        --card: #ffffff;
+        --accent: #2f5d62;
+        --text: #1e1e1e;
+        --muted: #6b6b6b;
+        --error: #b00020;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Georgia", "Times New Roman", serif;
+        background: radial-gradient(circle at top left, #fff5df, var(--bg));
+        color: var(--text);
+      }
+      .container {
+        max-width: 760px;
+        margin: 48px auto;
+        padding: 0 20px;
+      }
+      header {
+        margin-bottom: 24px;
+      }
+      h1 {
+        font-size: 2.2rem;
+        margin: 0 0 6px 0;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid #e6e0d6;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      }
+      form {
+        display: grid;
+        gap: 16px;
+      }
+      label {
+        font-weight: 600;
+      }
+      input,
+      select,
+      button {
+        font: inherit;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #d9d2c5;
+        background: #fff;
+      }
+      button {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:hover {
+        filter: brightness(0.95);
+      }
+      .result {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 10px;
+        background: #f7f7f7;
+        border: 1px dashed #d0c8bb;
+      }
+      .error {
+        color: var(--error);
+        font-weight: 600;
+      }
+      .hint {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Calculadora API</h1>
+        <p>Frontend simples para consumir a API com FastAPI.</p>
+      </header>
+
+      <section class="card">
+        <form id="calc-form">
+          <div>
+            <label for="numero1">Numero 1</label>
+            <input id="numero1" name="numero1" type="number" step="any" required />
+          </div>
+
+          <div>
+            <label for="numero2">Numero 2</label>
+            <input id="numero2" name="numero2" type="number" step="any" required />
+            <div class="hint">Para raiz, o Numero 2 e o indice (ex: 2 para raiz quadrada).</div>
+          </div>
+
+          <div>
+            <label for="operacao">Operacao</label>
+            <select id="operacao" name="operacao" required>
+              <option value="soma">Soma</option>
+              <option value="subtracao">Subtracao</option>
+              <option value="multiplicacao">Multiplicacao</option>
+              <option value="divisao">Divisao</option>
+              <option value="potencia">Potencia</option>
+              <option value="raiz">Raiz</option>
+            </select>
+          </div>
+
+          <button type="submit">Calcular</button>
+        </form>
+
+        <div id="resultado" class="result">Preencha os dados e clique em Calcular.</div>
+      </section>
+    </div>
+
+    <script>
+      const form = document.getElementById("calc-form");
+      const output = document.getElementById("resultado");
+
+      const endpointMap = {
+        soma: "/somar",
+        subtracao: "/subtrair",
+        multiplicacao: "/multiplicar",
+        divisao: "/dividir",
+        potencia: "/potencia",
+        raiz: "/raiz",
+      };
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        output.classList.remove("error");
+
+        const numero1 = Number(document.getElementById("numero1").value);
+        const numero2 = Number(document.getElementById("numero2").value);
+        const operacao = document.getElementById("operacao").value;
+
+        const endpoint = endpointMap[operacao];
+        const payload = { numero1, numero2 };
+
+        try {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            const msg = data.detail || "Erro ao calcular";
+            output.textContent = msg;
+            output.classList.add("error");
+            return;
+          }
+
+          output.textContent = `Resultado (${data.operacao}): ${data.resultado}`;
+        } catch (err) {
+          output.textContent = "Nao foi possivel conectar com a API.";
+          output.classList.add("error");
+        }
+      });
+    </script>
+  </body>
+</html>
