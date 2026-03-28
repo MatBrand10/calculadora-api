@@ -4,8 +4,6 @@ Projeto avaliativo da disciplina de Sistemas Distribuidos. Esta API realiza oper
 
 **Projeto Avaliativo desenvolvido para disciplina Programação de Sistemas Distribuidos da Universidade do Grandes Lagos - UNILAGO sob supervisão do Professor Gleydes Oliveira**
 
-Marque o perfil do professor: https://github.com/gleydes
-
 ## Requisitos
 
 - Python 3.12+
